@@ -31,6 +31,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useUploadThing } from "@/lib/uploadthing";
 
 import { Event } from "@prisma/client";
+import axios from "axios";
 
 type EventFormProps = {
   userId: string;
@@ -60,48 +61,48 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
   });
 
   async function onSubmit(values: z.infer<typeof eventFormSchema>) {
-    // let uploadedImageUrl = values.imageUrl;
-    // if (files.length > 0) {
-    //   const uploadedImages = await startUpload(files);
-    //   if (!uploadedImages) {
-    //     return;
-    //   }
-    //   uploadedImageUrl = uploadedImages[0].url;
-    // }
-    // if (type === "Create") {
-    //   try {
-    //     const newEvent = await createEvent({
-    //       event: { ...values, imageUrl: uploadedImageUrl },
-    //       userId,
-    //       path: "/profile",
-    //     });
-    //     if (newEvent) {
-    //       form.reset();
-    //       router.push(`/events/${newEvent._id}`);
-    //     }
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // }
-    // if (type === "Update") {
-    //   if (!eventId) {
-    //     router.back();
-    //     return;
-    //   }
-    //   try {
-    //     const updatedEvent = await updateEvent({
-    //       userId,
-    //       event: { ...values, imageUrl: uploadedImageUrl, _id: eventId },
-    //       path: `/events/${eventId}`,
-    //     });
-    //     if (updatedEvent) {
-    //       form.reset();
-    //       router.push(`/events/${updatedEvent._id}`);
-    //     }
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // }
+    let uploadedImageUrl = values.imageUrl;
+    if (files.length > 0) {
+      const uploadedImages = await startUpload(files);
+      if (!uploadedImages) {
+        return;
+      }
+      uploadedImageUrl = uploadedImages[0].url;
+    }
+    if (type === "Create") {
+      try {
+        const newEvent = await axios.post("/api/event", {
+          event: { ...values, imageUrl: uploadedImageUrl },
+          path: "/profile",
+        });
+
+        if (newEvent.data) {
+          form.reset();
+          router.push(`/events/${newEvent.data.id}`);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    if (type === "Update") {
+      // if (!eventId) {
+      //   router.back();
+      //   return;
+      // }
+      // try {
+      //   const updatedEvent = await updateEvent({
+      //     userId,
+      //     event: { ...values, imageUrl: uploadedImageUrl, _id: eventId },
+      //     path: `/events/${eventId}`,
+      //   });
+      //   if (updatedEvent) {
+      //     form.reset();
+      //     router.push(`/events/${updatedEvent._id}`);
+      //   }
+      // } catch (error) {
+      //   console.log(error);
+      // }
+    }
   }
 
   return (
