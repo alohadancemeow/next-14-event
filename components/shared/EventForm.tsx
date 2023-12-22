@@ -23,12 +23,12 @@ import { eventFormSchema } from "@/lib/validator";
 import { eventDefaultValues } from "@/constants";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "../ui/checkbox";
-// import { FileUploader } from "./FileUploader";
+import { FileUploader } from "./FileUploader";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-// import { useUploadThing } from "@/lib/uploadthing";
+import { useUploadThing } from "@/lib/uploadthing";
 
 import { Event } from "@prisma/client";
 
@@ -52,7 +52,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
         }
       : eventDefaultValues;
 
-  //   const { startUpload } = useUploadThing("imageUploader");
+  const { startUpload } = useUploadThing("imageUploader");
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
@@ -167,11 +167,11 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormControl className="h-72">
-                  {/* <FileUploader
+                  <FileUploader
                     onFieldChange={field.onChange}
                     imageUrl={field.value}
                     setFiles={setFiles}
-                  /> */}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
