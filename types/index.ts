@@ -1,3 +1,18 @@
+import { Prisma } from "@prisma/client";
+
+export const eventPopulated = Prisma.validator<Prisma.EventInclude>()({
+  Category: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+});
+
+export type EventPopulated = Prisma.EventGetPayload<{
+  include: typeof eventPopulated;
+}>;
+
 // ====== USER PARAMS
 export type CreateUserParams = {
   clerkId: string;
