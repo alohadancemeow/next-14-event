@@ -33,8 +33,6 @@ const Dropdown = ({ value, onChangeHandler }: DropdownProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCategory, setNewCategory] = useState("");
 
-  console.log(categories, "categories");
-
   const handleAddCategory = async () => {
     try {
       await axios.post("/api/category", { name: newCategory }).then((res) => {

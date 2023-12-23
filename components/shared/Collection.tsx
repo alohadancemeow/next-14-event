@@ -1,4 +1,3 @@
-import { Category, Event } from "@prisma/client";
 import Card from "./Card";
 import Pagination from "./Pagination";
 import { EventPopulated } from "@/types";

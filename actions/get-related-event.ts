@@ -2,7 +2,6 @@
 
 import { db } from "@/lib/db";
 import { EventPopulated } from "@/types";
-import { Category } from "@prisma/client";
 
 type RelatedEventProps = {
   eventId: string;
@@ -20,32 +19,35 @@ export const getRelatedEvents = async ({
   try {
     const skipAmount = (Number(page) - 1) * limit;
 
-    const relatedEvents = await db.event.findMany({
-      where: {
-        categoryId,
-        NOT: {
-          id: eventId,
-        },
-      },
-      skip: skipAmount,
-      take: limit,
-      orderBy: {
-        createdAt: "desc",
-      },
-
-      include: {
-        Category: {
-          select: {
-            id: true,
-            name: true,
+    const [relatedEvents, total] = await db.$transaction([
+      db.event.findMany({
+        where: {
+          categoryId,
+          NOT: {
+            id: eventId,
           },
         },
-      },
-    });
+        skip: skipAmount,
+        take: limit,
+        orderBy: {
+          createdAt: "desc",
+        },
+
+        include: {
+          Category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      }),
+      db.event.count(),
+    ]);
 
     return {
       data: relatedEvents as EventPopulated[],
-      totalPages: Math.ceil(relatedEvents.length / limit),
+      totalPages: Math.ceil(total / limit),
     };
   } catch (error) {
     console.log(error);
