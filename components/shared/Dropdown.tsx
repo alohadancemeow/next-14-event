@@ -1,5 +1,7 @@
 "use client";
 
+import axios from "axios";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -7,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { startTransition, useEffect, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,7 +23,6 @@ import {
 import { Input } from "../ui/input";
 
 import { Category } from "@prisma/client";
-import axios from "axios";
 
 type DropdownProps = {
   value?: string;
@@ -33,21 +33,30 @@ const Dropdown = ({ value, onChangeHandler }: DropdownProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCategory, setNewCategory] = useState("");
 
+  console.log(categories, "categories");
+
   const handleAddCategory = async () => {
     try {
-      await axios.post("/api/category", { name: newCategory });
+      await axios.post("/api/category", { name: newCategory }).then((res) => {
+        if (res.status === 200) {
+          setCategories([...categories, res.data]);
+        }
+      });
     } catch (error) {
       console.log(error);
     }
   };
 
+  const getCategories = async () => {
+    const res = await axios.get("/api/category");
+    if (res.data) {
+      setCategories([...categories, ...res.data]);
+    }
+  };
+
   useEffect(() => {
-    const getCategories = async () => {
-      const categoryList = await axios.get("/api/category");
-      categoryList && setCategories(categoryList.data);
-    };
     getCategories();
-  }, [categories]);
+  }, []);
 
   return (
     <Select onValueChange={onChangeHandler} defaultValue={value}>
@@ -84,10 +93,7 @@ const Dropdown = ({ value, onChangeHandler }: DropdownProps) => {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                // onClick={() => startTransition(handleAddCategory)}
-                onClick={handleAddCategory}
-              >
+              <AlertDialogAction onClick={() => handleAddCategory()}>
                 Add
               </AlertDialogAction>
             </AlertDialogFooter>
