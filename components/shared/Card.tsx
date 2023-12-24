@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs";
 import { formatDateTime } from "@/lib/utils";
 import { DeleteConfirmation } from "./DeleteConfirmation";
 import { EventPopulated } from "@/types";
+import { getOrganizerName } from "@/actions/get-organizer-name";
 
 type CardProps = {
   event: EventPopulated;
@@ -11,10 +12,11 @@ type CardProps = {
   hidePrice?: boolean;
 };
 
-const Card = ({ event, hasOrderLink, hidePrice }: CardProps) => {
+const Card = async ({ event, hasOrderLink, hidePrice }: CardProps) => {
   const { sessionClaims } = auth();
   const userId = sessionClaims?.userId as string;
 
+  const organizer = await getOrganizerName(event.organizer);
   const isEventCreator = userId === event.organizer;
 
   return (
@@ -65,8 +67,7 @@ const Card = ({ event, hasOrderLink, hidePrice }: CardProps) => {
 
         <div className="flex-between w-full">
           <p className="p-medium-14 md:p-medium-16 text-grey-600">
-            {/* {event.organizer.firstName} {event.organizer.lastName} */}
-            organizer name
+            {organizer}
           </p>
 
           {hasOrderLink && (

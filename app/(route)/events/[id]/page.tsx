@@ -1,13 +1,13 @@
+import { db } from "@/lib/db";
+import Image from "next/image";
+
 import CheckoutButton from "@/components/shared/CheckoutButton";
 import Collection from "@/components/shared/Collection";
-import { db } from "@/lib/db";
-
-import { clerkClient } from "@clerk/nextjs";
 
 import { formatDateTime } from "@/lib/utils";
 import { SearchParamProps } from "@/types";
-import Image from "next/image";
 import { getRelatedEvents } from "@/actions/get-related-event";
+import { getOrganizerName } from "@/actions/get-organizer-name";
 
 const EventDetails = async ({
   params: { id },
@@ -20,15 +20,7 @@ const EventDetails = async ({
     },
   });
 
-  const { firstName, lastName } = await clerkClient.users.getUser(
-    event?.organizer as string
-  );
-
-  // const relatedEvents = await getRelatedEventsByCategory({
-  //   categoryId: event.category._id,
-  //   eventId: event._id,
-  //   page: searchParams.page as string,
-  // });
+  const organizer = event && (await getOrganizerName(event?.organizer));
 
   const relatedEvents = await getRelatedEvents({
     eventId: id,
@@ -65,8 +57,7 @@ const EventDetails = async ({
                 </div>
 
                 <p className="p-medium-18 ml-2 mt-2 sm:mt-0">
-                  by{" "}
-                  <span className="text-primary-500">{`${firstName} ${lastName}`}</span>
+                  by <span className="text-primary-500">{organizer}</span>
                 </p>
               </div>
             </div>
