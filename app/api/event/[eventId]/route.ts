@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-export async function PATCH(
+export async function PUT(
   request: Request,
   { params }: { params: { eventId: string } }
 ) {
@@ -21,7 +21,7 @@ export async function PATCH(
     }
 
     const existingEvent = await db.event.findUnique({
-      where: { id: event.id },
+      where: { id: params.eventId },
     });
 
     if (!existingEvent) throw new Error("Event not found");
@@ -47,7 +47,36 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
+export async function PATCH(
   request: Request,
   { params }: { params: { eventId: string } }
-) {}
+) {
+  try {
+    const { path } = await request.json();
+
+    const { userId } = auth();
+    if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+
+    if (!params.eventId) {
+      return new NextResponse("Event ID missing", { status: 400 });
+    }
+
+    const existingEvent = await db.event.findUnique({
+      where: { id: params.eventId },
+    });
+
+    if (!existingEvent) throw new Error("Event not found");
+    if (existingEvent.organizer !== userId) throw new Error("Unauthorized");
+
+    const deletedEvent = await db.event.delete({
+      where: { id: existingEvent.id },
+    });
+
+    if (deletedEvent) revalidatePath(path);
+
+    return NextResponse.json(deletedEvent);
+  } catch (error) {
+    console.log("[EVENT_DELETE]", error);
+    return new NextResponse("Interanl error", { status: 500 });
+  }
+}

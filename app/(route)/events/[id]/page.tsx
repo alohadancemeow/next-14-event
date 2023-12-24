@@ -36,8 +36,6 @@ const EventDetails = async ({
     page: searchParams.page as string,
   });
 
-  console.log(relatedEvents, "relatedEvents");
-
   if (!event) return null;
 
   return (

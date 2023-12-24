@@ -1,8 +1,9 @@
 "use client";
 
-import { useTransition } from "react";
-import { usePathname } from "next/navigation";
+import axios from "axios";
 import Image from "next/image";
+import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 
 import {
   AlertDialog,
@@ -16,11 +17,31 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-// import { deleteEvent } from "@/lib/actions/event.actions";
-
 export const DeleteConfirmation = ({ eventId }: { eventId: string }) => {
+  let [isPending, setIsPending] = useState(false);
+
+  const router = useRouter();
   const pathname = usePathname();
-  let [isPending, startTransition] = useTransition();
+
+  const onDelete = async () => {
+    try {
+      setIsPending(true);
+      await axios
+        .patch(`/api/event/${eventId}`, {
+          path: pathname,
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            setIsPending(false);
+            router.refresh();
+          }
+        });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsPending(false);
+    }
+  };
 
   return (
     <AlertDialog>
@@ -44,13 +65,7 @@ export const DeleteConfirmation = ({ eventId }: { eventId: string }) => {
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
 
-          <AlertDialogAction
-          // onClick={() =>
-          //   startTransition(async () => {
-          //     await deleteEvent({ eventId, path: pathname });
-          //   })
-          // }
-          >
+          <AlertDialogAction onClick={onDelete}>
             {isPending ? "Deleting..." : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>

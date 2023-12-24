@@ -69,6 +69,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
       }
       uploadedImageUrl = uploadedImages[0].url;
     }
+
     if (type === "Create") {
       try {
         const newEvent = await axios.post("/api/event", {
@@ -84,24 +85,26 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
         console.log(error);
       }
     }
+
     if (type === "Update") {
-      // if (!eventId) {
-      //   router.back();
-      //   return;
-      // }
-      // try {
-      //   const updatedEvent = await updateEvent({
-      //     userId,
-      //     event: { ...values, imageUrl: uploadedImageUrl, _id: eventId },
-      //     path: `/events/${eventId}`,
-      //   });
-      //   if (updatedEvent) {
-      //     form.reset();
-      //     router.push(`/events/${updatedEvent._id}`);
-      //   }
-      // } catch (error) {
-      //   console.log(error);
-      // }
+      if (!eventId) {
+        router.back();
+        return;
+      }
+
+      try {
+        const { data } = await axios.put(`/api/event/${eventId}`, {
+          event: { ...values, imageUrl: uploadedImageUrl },
+          path: `/events/${eventId}`,
+        });
+
+        if (data) {
+          form.reset();
+          router.push(`/events/${data.id}`);
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 
