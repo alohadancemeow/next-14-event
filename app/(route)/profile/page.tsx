@@ -1,23 +1,18 @@
 import Link from "next/link";
 
-import Collection from "@/components/shared/Collection";
 import { Button } from "@/components/ui/button";
-// import { getEventsByUser } from "@/lib/actions/event.actions";
-// import { getOrdersByUser } from "@/lib/actions/order.actions";
-// import { IOrder } from "@/lib/database/models/order.model";
+import Collection from "@/components/shared/Collection";
 
 import { SearchParamProps } from "@/types";
-import { getOrdersByUser } from "@/actions/get-orders-by-user";
+import { getEventOrdersByUser } from "@/actions/get-event-orders-by-user";
 import { getEventsByUser } from "@/actions/get-events-by-user";
 
 const ProfilePage = async ({ searchParams }: SearchParamProps) => {
   const ordersPage = Number(searchParams?.ordersPage) || 1;
   const eventsPage = Number(searchParams?.eventsPage) || 1;
 
-  const orders = await getOrdersByUser({ page: ordersPage });
   const events = await getEventsByUser({ page: eventsPage });
-
-  // const orderedEvents = orders?.data.map((order: IOrder) => order.event) || [];
+  const orderedEvents = await getEventOrdersByUser({ page: ordersPage });
 
   return (
     <>
@@ -32,16 +27,18 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
       </section>
 
       <section className="wrapper my-8">
-        {/* <Collection
-          data={orderedEvents}
-          emptyTitle="No event tickets purchased yet"
-          emptyStateSubtext="No worries - plenty of exciting events to explore!"
-          collectionType="My_Tickets"
-          limit={3}
-          page={ordersPage}
-          urlParamName="ordersPage"
-          totalPages={orders?.totalPages}
-        /> */}
+        {orderedEvents && (
+          <Collection
+            data={orderedEvents.data}
+            emptyTitle="No event tickets purchased yet"
+            emptyStateSubtext="No worries - plenty of exciting events to explore!"
+            collectionType="My_Tickets"
+            limit={3}
+            page={ordersPage}
+            urlParamName="ordersPage"
+            totalPages={orderedEvents.totalPages}
+          />
+        )}
       </section>
 
       {/* Events Organized */}

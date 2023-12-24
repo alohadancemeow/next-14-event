@@ -1,39 +1,48 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { EventPopulated } from "@/types";
 import { auth } from "@clerk/nextjs";
-import { Order } from "@prisma/client";
-import { NextResponse } from "next/server";
 
 type OrderProps = {
   page: string | number;
   limit?: number;
 };
 
-export const getOrdersByUser = async ({
+export const getEventOrdersByUser = async ({
   limit = 3,
   page = "1",
 }: OrderProps) => {
   try {
     const { userId } = auth();
-    if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+    if (!userId) throw new Error("Unauthorized");
 
     const skipAmount = (Number(page) - 1) * limit;
 
-    const [orders, total] = await db.$transaction([
-      db.order.findMany({
+    const [events, total] = await db.$transaction([
+      db.event.findMany({
         where: {
-          userId,
+          Order: {
+            userId,
+          },
         },
         skip: skipAmount,
         take: limit,
         orderBy: { createdAt: "desc" },
+        include: {
+          Category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
       }),
       db.order.count(),
     ]);
 
     return {
-      data: orders as Order[],
+      data: events as EventPopulated[],
       totalPages: Math.ceil(total / limit),
     };
   } catch (error) {
