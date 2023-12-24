@@ -1,12 +1,12 @@
-import { formatDateTime } from "@/lib/utils";
-import { auth } from "@clerk/nextjs";
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
+import { auth } from "@clerk/nextjs";
+import { formatDateTime } from "@/lib/utils";
 import { DeleteConfirmation } from "./DeleteConfirmation";
-import { Event } from "@prisma/client";
+import { EventPopulated } from "@/types";
 
 type CardProps = {
-  event: Event;
+  event: EventPopulated;
   hasOrderLink?: boolean;
   hidePrice?: boolean;
 };
@@ -48,8 +48,7 @@ const Card = ({ event, hasOrderLink, hidePrice }: CardProps) => {
               {event.isFree ? "FREE" : `$${event.price}`}
             </span>
             <p className="p-semibold-14 w-min rounded-full bg-grey-500/10 px-4 py-1 text-grey-500 line-clamp-1">
-              {/* {event.category.name} */}
-              category name
+              {event.Category.name}
             </p>
           </div>
         )}

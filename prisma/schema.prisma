@@ -37,9 +37,10 @@ model Category {
 }
 
 model Order {
-  id          String @id @default(auto()) @map("_id") @db.ObjectId
-  stripeId    String @unique
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  stripeId    String   @unique
   totalAmount String
+  createdAt   DateTime @default(now())
 
   events Event[]
   userId String
