@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs";
 import { formatDateTime } from "@/lib/utils";
 import { DeleteConfirmation } from "./DeleteConfirmation";
 import { EventPopulated } from "@/types";
-import { getOrganizerName } from "@/actions/get-organizer-name";
+import { getUsername } from "@/actions/get-username";
 
 type CardProps = {
   event: EventPopulated;
@@ -16,7 +16,7 @@ const Card = async ({ event, hasOrderLink, hidePrice }: CardProps) => {
   const { sessionClaims } = auth();
   const userId = sessionClaims?.userId as string;
 
-  const organizer = await getOrganizerName(event.organizer);
+  const organizer = await getUsername(event.organizer);
   const isEventCreator = userId === event.organizer;
 
   return (

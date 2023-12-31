@@ -7,7 +7,7 @@ import Collection from "@/components/shared/Collection";
 import { formatDateTime } from "@/lib/utils";
 import { SearchParamProps } from "@/types";
 import { getRelatedEvents } from "@/actions/get-related-event";
-import { getOrganizerName } from "@/actions/get-organizer-name";
+import { getUsername } from "@/actions/get-username";
 
 const EventDetails = async ({
   params: { id },
@@ -20,7 +20,7 @@ const EventDetails = async ({
     },
   });
 
-  const organizer = event && (await getOrganizerName(event?.organizer));
+  const organizer = event && (await getUsername(event?.organizer));
 
   const relatedEvents = await getRelatedEvents({
     eventId: id,
