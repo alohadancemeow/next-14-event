@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Order, Prisma } from "@prisma/client";
 
 export const eventPopulated = Prisma.validator<Prisma.EventInclude>()({
   Category: {
@@ -12,6 +12,10 @@ export const eventPopulated = Prisma.validator<Prisma.EventInclude>()({
 export type EventPopulated = Prisma.EventGetPayload<{
   include: typeof eventPopulated;
 }>;
+
+export type OrderInput = Pick<Order, "totalAmount"> & {
+  isFree: boolean;
+};
 
 // ====== USER PARAMS
 export type CreateUserParams = {

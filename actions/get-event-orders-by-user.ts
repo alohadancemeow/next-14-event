@@ -22,8 +22,8 @@ export const getEventOrdersByUser = async ({
     const [events, total] = await db.$transaction([
       db.event.findMany({
         where: {
-          Order: {
-            userId,
+          orders: {
+            some: { userId },
           },
         },
         skip: skipAmount,

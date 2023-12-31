@@ -8,8 +8,8 @@ import Checkout from "./Checkout";
 import { Event } from "@prisma/client";
 
 const CheckoutButton = ({ event }: { event: Event }) => {
-  const { user } = useUser();
-  const userId = user?.publicMetadata.userId as string;
+  // const { user } = useUser();
+  // const userId = user?.publicMetadata.userId as string;
   const hasEventFinished = new Date(event.endDateTime) < new Date();
 
   return (
@@ -27,7 +27,7 @@ const CheckoutButton = ({ event }: { event: Event }) => {
           </SignedOut>
 
           <SignedIn>
-            <Checkout event={event} userId={userId} />
+            <Checkout event={event} />
           </SignedIn>
         </>
       )}

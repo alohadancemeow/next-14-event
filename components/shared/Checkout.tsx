@@ -1,39 +1,47 @@
+"use client";
+
+import axios from "axios";
 import React, { useEffect } from "react";
-// import { loadStripe } from '@stripe/stripe-js';
+import { getStripe } from "@/lib/stripe-client";
 
 import { Button } from "../ui/button";
-// import { checkoutOrder } from '@/lib/actions/order.actions';
 import { Event } from "@prisma/client";
+import { OrderInput } from "@/types";
 
-// loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+const Checkout = ({ event }: { event: Event }) => {
+  const onCheckout = async () => {
+    const order: OrderInput = {
+      totalAmount: event.price,
+      isFree: event.isFree,
+    };
 
-const Checkout = ({ event, userId }: { event: Event; userId: string }) => {
-  //   useEffect(() => {
-  //     // Check to see if this is a redirect back from Checkout
-  //     const query = new URLSearchParams(window.location.search);
-  //     if (query.get('success')) {
-  //       console.log('Order placed! You will receive an email confirmation.');
-  //     }
+    try {
+      const response = await axios.post(`/api/checkout/${event.id}`, { order });
+      // console.log(response, "response");
 
-  //     if (query.get('canceled')) {
-  //       console.log('Order canceled -- continue to shop around and checkout when you’re ready.');
-  //     }
-  //   }, []);
+      const stripe = await getStripe();
+      stripe?.redirectToCheckout({ sessionId: response.data.session.id });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  //   const onCheckout = async () => {
-  //     const order = {
-  //       eventTitle: event.title,
-  //       eventId: event._id,
-  //       price: event.price,
-  //       isFree: event.isFree,
-  //       buyerId: userId
-  //     }
+  // Check to see if this is a redirect back from Checkout
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    if (query.get("success")) {
+      console.log("Order placed! You will receive an email confirmation.");
+    }
 
-  //     await checkoutOrder(order);
-  //   }
+    if (query.get("canceled")) {
+      console.log(
+        "Order canceled -- continue to shop around and checkout when you’re ready."
+      );
+    }
+  }, []);
 
   return (
-    <form action={() => {}} method="post">
+    <form action={onCheckout} method="post">
       <Button type="submit" role="link" size="lg" className="button sm:w-fit">
         {event.isFree ? "Get Ticket" : "Buy Ticket"}
       </Button>

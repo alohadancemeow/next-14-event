@@ -26,8 +26,7 @@ model Event {
   categoryId String   @db.ObjectId
   Category   Category @relation(fields: [categoryId], references: [id])
   organizer  String
-  orderId    String?  @db.ObjectId
-  Order      Order?   @relation(fields: [orderId], references: [id])
+  orders     Order[]
 }
 
 model Category {
@@ -42,6 +41,7 @@ model Order {
   totalAmount String
   createdAt   DateTime @default(now())
 
-  events Event[]
-  userId String
+  eventId String? @db.ObjectId
+  event   Event?  @relation(fields: [eventId], references: [id])
+  userId  String
 }
